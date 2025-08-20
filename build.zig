@@ -44,7 +44,7 @@ pub fn build(b: *std.Build) void {
     });
     elf_to_uf2_command.addArtifactArg(elf);
 
-    const uf2_install_path = b.getInstallPath(.bin, "blink.uf2");
+    const uf2_install_path = b.getInstallPath(.bin, "homeboy.uf2");
     elf_to_uf2_command.addArg(uf2_install_path);
 
     b.getInstallStep().dependOn(&elf_to_uf2_command.step);

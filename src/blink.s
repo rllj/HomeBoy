@@ -1,10 +1,10 @@
 .section .text
 
 .equ IO_BANK0_BASE,      0x40028000
-.equ GPIO25_CTRL_OFFSET, 0x0cc
+.equ GPIO25_CTRL_OFFSET, 0x000000cc
 
 .equ PADS_BANK0_BASE,     0x40038000      
-.equ PADS_GPIO25_OFFSET,  0x068
+.equ PADS_GPIO25_OFFSET,  0x00000068
 
 .equ ATOMIC_SET, 0x2000
 .equ ATOMIC_CLR, 0x3000
@@ -14,8 +14,12 @@
 .equ SIO_BASE, 0xd0000000
 
 .equ GPIO_OUT_SET, 0x018
-.equ GPIO_OUT_XOR,  0x028
+.equ GPIO_OUT_XOR, 0x028
 .equ GPIO_OE_SET,  0x038
+
+.equ TIMER0,   0x400b0000
+.equ TIMELR,   0x0000000c
+.equ TIMER0LR, 0x400b000c
 
 .global _start
 _start:
@@ -43,9 +47,14 @@ _start:
     li t1, (1<<25)
     sw t1, (t0)
 
-    li a0, 0
-    li a1, 10000000
-    j idle_loop
+    li a0, 500000
+    toggle_led:
+    call wait_microseconds
+    li t0, SIO_BASE+GPIO_OUT_XOR
+    li t1, (1<<25)
+    sw t1, (t0)
+    j toggle_led
+
 
 bss_zero_loop:
     sw x0, (a0)
@@ -54,12 +63,13 @@ bss_zero:
     bltu a0, a1, bss_zero_loop
     ret
 
-toggle_light:
-    li a0, 0
-    li t0, SIO_BASE+GPIO_OUT_XOR
-    li t1, (1<<25)
-    sw t1, (t0)
-idle_loop:
-    addi a0, a0, 1
-    beq a0, a1, toggle_light
-    j idle_loop
+# Perhaps implement with MTIMECMP + interrupts later?
+wait_loop:
+    lw t1, (t0)
+    bltu t1, t2, wait_loop
+    ret
+wait_microseconds:
+    li t0, TIMER0LR
+    lw t1, (t0)
+    add t2, a0, t1
+    j wait_loop
