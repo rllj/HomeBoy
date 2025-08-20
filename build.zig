@@ -10,23 +10,23 @@ pub fn build(b: *std.Build) void {
         .abi = .none,
     } });
 
-    const module = b.addModule("gb-pico", .{
+    const module = b.addModule("homeboy", .{
         .optimize = optimise,
         .target = target,
     });
 
     const elf = b.addExecutable(.{
-        .name = "gb-pico.elf",
+        .name = "homeboy.elf",
         .root_module = module,
     });
 
     elf.setLinkerScript(b.path("./linker.ld"));
     elf.root_module.addCSourceFile(.{
-        .file = b.path("./src/picobin_block.S"),
+        .file = b.path("./src/picobin_block.s"),
         .flags = &.{ "-march=rv32imac_zicsr_zba_zbb_zbc_zbs", "-mabi=ilp32" },
     });
     elf.root_module.addCSourceFile(.{
-        .file = b.path("./src/blink.S"),
+        .file = b.path("./src/blink.s"),
         .flags = &.{ "-march=rv32imac_zicsr_zba_zbb_zbc_zbs", "-mabi=ilp32" },
     });
 

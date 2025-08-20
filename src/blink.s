@@ -14,14 +14,14 @@
 .equ SIO_BASE, 0xd0000000
 
 .equ GPIO_OUT_SET, 0x018
+.equ GPIO_OUT_XOR,  0x028
 .equ GPIO_OE_SET,  0x038
 
 .global _start
 _start:
-    # This is commented out for now, as I'm not using .bss
-    #la a0, _bss_start
-    #la a1, _bss_end
-    #call bss_zero
+    la a0, _bss_start
+    la a1, _bss_end
+    call bss_zero
 
     # Configure FUNC
     li t0, IO_BANK0_BASE+GPIO25_CTRL_OFFSET+ATOMIC_CLR
@@ -43,6 +43,8 @@ _start:
     li t1, (1<<25)
     sw t1, (t0)
 
+    li a0, 0
+    li a1, 10000000
     j idle_loop
 
 bss_zero_loop:
@@ -52,6 +54,12 @@ bss_zero:
     bltu a0, a1, bss_zero_loop
     ret
 
+toggle_light:
+    li a0, 0
+    li t0, SIO_BASE+GPIO_OUT_XOR
+    li t1, (1<<25)
+    sw t1, (t0)
 idle_loop:
-    nop
+    addi a0, a0, 1
+    beq a0, a1, toggle_light
     j idle_loop

@@ -1,5 +1,5 @@
 {
-  description = "GB-Pico";
+  description = "Devshell for HomeBoy";
 
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs?ref=nixos-unstable";
