@@ -11,7 +11,6 @@ pub fn build(b: *std.Build) void {
     } });
 
     const module = b.addModule("homeboy", .{
-        .optimize = optimise,
         .target = target,
     });
 
@@ -20,7 +19,18 @@ pub fn build(b: *std.Build) void {
         .root_module = module,
     });
 
+    const zig_entry_mod = b.addModule("zig-entry", .{
+        .optimize = optimise,
+        .target = target,
+        .root_source_file = b.path("src/main.zig"),
+    });
+    const zig_entry = b.addObject(.{
+        .name = "zig-entry",
+        .root_module = zig_entry_mod,
+    });
+
     elf.setLinkerScript(b.path("./linker.ld"));
+    elf.root_module.addObject(zig_entry);
     elf.root_module.addCSourceFile(.{
         .file = b.path("./src/picobin_block.s"),
         .flags = &.{ "-march=rv32imac_zicsr_zba_zbb_zbc_zbs", "-mabi=ilp32" },

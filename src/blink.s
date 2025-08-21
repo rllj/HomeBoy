@@ -47,14 +47,7 @@ _start:
     li t1, (1<<25)
     sw t1, (t0)
 
-    li a0, 500000
-    toggle_led:
-    call wait_microseconds
-    li t0, SIO_BASE+GPIO_OUT_XOR
-    li t1, (1<<25)
-    sw t1, (t0)
-    j toggle_led
-
+    j main
 
 bss_zero_loop:
     sw x0, (a0)
@@ -63,11 +56,19 @@ bss_zero:
     bltu a0, a1, bss_zero_loop
     ret
 
+.global toggle_led
+toggle_led:
+    li t0, SIO_BASE+GPIO_OUT_XOR
+    li t1, (1<<25)
+    sw t1, (t0)
+    ret
+
 # Perhaps implement with MTIMECMP + interrupts later?
 wait_loop:
     lw t1, (t0)
     bltu t1, t2, wait_loop
     ret
+.global wait_microseconds
 wait_microseconds:
     li t0, TIMER0LR
     lw t1, (t0)

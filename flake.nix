@@ -18,10 +18,15 @@
     in
     {
       devShells.${system}.default = pkgs.mkShell {
-        buildInputs = with pkgs; [
-          zig.packages.${pkgs.system}.master
-          picotool
-        ];
+        buildInputs =
+          with pkgs;
+          [
+            zig.packages.${pkgs.system}.master
+            picotool
+          ]
+          ++ (with pkgs.llvmPackages_20; [
+            bintools
+          ]);
       };
     };
 }
